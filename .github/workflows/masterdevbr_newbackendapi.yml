@@ -1,0 +1,83 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - newbackendapi
+
+on:
+  push:
+    branches:
+      - masterDevBr
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+
+      - name: npm install, build, and test
+        run: |
+          yarn install
+          yarn run build
+          # npm run test --if-present
+
+      # Archive build artifact
+      - name: Archive Application
+        uses: montudor/action-zip@v0.1.0
+        with:
+          args: zip -qq -r newdevbackendapip.zip .
+          #args: zip -qq -r newdevbackendapip.zip . -i /temp
+          
+      - name: list content after download task
+        run: |
+          ls -ltr
+          ls -ltr dist
+          #touch /temptemp
+          pwd
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: newdevbackendapip.zip
+          path: newdevbackendapip.zip
+          #path: temp/newdevbackendapi.zip
+          
+      - name: list content after download task
+        run: |
+          #ls -ltr
+          pwd
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: newdevbackendapip.zip
+          path: .
+          #path: temp/
+          
+      - name: list content after download task
+        run: |
+          ls -ltr
+          pwd
+
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'newbackendapi'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CB4C521EB69A4366A6116858A289499B }}
+          package: ./newdevbackendapip.zip

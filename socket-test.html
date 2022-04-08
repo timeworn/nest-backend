@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket test</title>
+  </head>
+  <body>
+    <div id="app">
+      <p>{{message}}</p>
+
+      <input type="text" v-model="productName" /> <br />
+      <input type="text" v-model="lng" placeholder="lng" />
+      <input type="text" v-model="lat" placeholder="lat" />
+      <button @click.prevent="handleSearch">Search</button>
+
+      <br />
+      <br />
+      <br />
+      <br />
+
+      <input type="text" v-model="smartSearch.smartSearchId" /> <br />
+      <!-- <button @click.prevent="handleJoin">Join Search</button> -->
+
+      <input type="text" v-model="smartSearch.productId" /> <br />
+      <button @click.prevent="handleJoin">Join Search</button>
+
+      <br /><br />
+
+      <input type="text" name="identifier" v-model="loginDto.identifier" id="" />
+      <br /><br />
+      <input type="text" name="password" v-model="loginDto.password" id="" />
+
+      <button @click.prevent="handleLogin">Login</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <!-- <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"
+      integrity="sha512-iZIBSs+gDyTH0ZhUem9eQ1t4DcEn2B9lHxfRMeGQhyNdSUz+rb+5A3ummX6DQTOIs1XK0gOteOg/LPtSo9VJ+w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script> -->
+    <!-- <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.4.0/socket.io.js"
+      integrity="sha512-arrjWL9j77mqBliRaQx5EutCwBC7259LWHAkOhDVpCoGVx4sRMcnYBBs0HedwvLvWqn7/bmBlr20eiESgHe2tg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script> -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.4.0/socket.io.js"
+      integrity="sha512-Y8KodDCDqst1e8z0EGKiqEQq3T8NszmgW2HvsC6+tlNw7kxYxHTLl5Iw/gqZj/6qhZdBt+jYyOsybgSAiB9OOA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <!-- <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"
+      integrity="sha512-WL6WGKMPBiM9PnHRYIn5YEtq0Z8XP4fkVb4qy7PP4vhmYQErJ/dySyXuFIMDf1eEYCXCrQrMJfkNwKc9gsjTjA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script> -->
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+      integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script>
+      const code = 554240;
+      const socketUrl = 'https://dc5c-105-112-39-159.ngrok.io';
+      const apiUrl = `${socketUrl}/api`;
+      // const token =
+      //   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRiMmJiZmFiLTgwN2YtNDBmZS04MzdhLTk0YzdiZjMwMmMwZSIsImlhdCI6MTYzMTI0MDA1MywiZXhwIjoxNjYyNzk3NjUzfQ.ktYO8_puEI8YxCwV8QjWyvS3zZNF_C2ABIYhCWVw8wA';
+      const token =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ3NzVmNzNiLTg4YWItNDI4OC1iNGNmLWEwY2Y3YWM2ZWU0MyIsImlhdCI6MTYzMTI0NjI3MCwiZXhwIjoxNjYyODAzODcwfQ.i78R0RMEb4bMe-LH2bjyJa4Py0ZNflUC0-z1ECbjK0o';
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const socket = io(socketUrl, {
+        query: {
+          token,
+        },
+      });
+
+      var app = new Vue({
+        el: '#app',
+        data: {
+          message: 'Hello Vue!',
+          productName: '',
+          lat: 6.524379,
+          // lat: 6.59568,
+          lng: 3.33703,
+          // lng: 3.379206,
+          // lng: 6.962205699999999,
+          // lat: 4.8184381,6.497872153156975, 3.383323303347627
+          smartSearch: {},
+          loginDto: {
+            identifier: '',
+            password: '',
+          },
+        },
+        methods: {
+          async handleSearch() {
+            console.log('emiting event', { productName: this.productName });
+
+            const response = await axios.post(
+              `${apiUrl}/smart-search`,
+              // 'https://thespottrapp.herokuapp.com/search-requests',
+              {
+                productName: this.productName,
+                lat: this.lat,
+                lng: this.lng,
+                type: 'simple',
+              },
+            );
+            this.productName = '';
+          },
+          async handleJoin() {
+            const response = await axios.patch(
+              `${apiUrl}/smart-search/${this.smartSearch.smartSearchId}/join`,
+              {
+                ...this.smartSearch,
+                customOffer: {
+                  amount: 10000,
+                  quantity: 10,
+                  description: 'fkenfikenfikenifi',
+                },
+              },
+              // `https://thespottrapp.herokuapp.com/search-requests/${this.searchRequest.searchRequestId}/join`,
+            );
+          },
+          async handleLogin() {
+            console.log(apiUrl);
+            const response = await axios.post(
+              `${apiUrl}/auth/sign-in`,
+              // 'https://thespottrapp.herokuapp.com/user/auth/login',
+              this.loginDto,
+            );
+          },
+        },
+        created: function () {
+          socket.on('user-product-request', (data) => {
+            console.log('response from socket is ', data);
+            confirm(data.message);
+
+            this.smartSearch = data;
+            this.smartSearch.productId = data.availableProducts[0].id;
+          });
+
+          socket.on('smart-search', (data) => {
+            alert(data.message);
+            console.log('updated data is ', data);
+          });
+        },
+      });
+    </script>
+  </body>
+</html>
+
+<!-- {
+  lat: 6.524379,
+              lng: 3.379206,
+} -->

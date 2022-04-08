@@ -1,0 +1,11 @@
+[
+  {
+    "new_order": {
+      "paymentMethod": "cliq_token",
+      "currency": "CT",
+      "fee": 0,
+      "feeCap": 0,
+      "isPercentage": false
+    }
+  }
+]

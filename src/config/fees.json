@@ -1,0 +1,30 @@
+[
+  {
+    "fee": 1.5,
+    "feeCap": 2000,
+    "additionalFee": 150,
+    "paymentMethod": "card",
+    "currency": "NGN",
+    "operation": "new_order",
+    "isPercentage": true
+  },
+
+  {
+    "fee": 0,
+    "feeCap": 0,
+    "additionalFee": 0,
+    "paymentMethod": "cliq_token",
+    "currency": "CT",
+    "operation": "new_order",
+    "isPercentage": false
+  },
+  {
+    "fee": 1.5,
+    "feeCap": 2000,
+    "additionalFee": 0,
+    "paymentMethod": "fiat_wallet",
+    "currency": "NGN",
+    "operation": "new_order",
+    "isPercentage": true
+  }
+]
